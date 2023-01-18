@@ -30,7 +30,6 @@ void setup()
     pinMode(WIFI_LED, OUTPUT);
     pinMode(COMMIT_LED, OUTPUT);
 
-    
     Serial.begin(9600);
 
     WiFi.mode(WIFI_STA);
@@ -73,7 +72,6 @@ void loop()
           playBuzzer();
           flashLed();
           
-
           Serial.println("Updated...");
       }
 
