@@ -17,11 +17,20 @@ HTTPClient httpsClient;
 StaticJsonDocument<16> filter_sha;
 StaticJsonDocument<64> doc;
 
-const int BUZZER = 4;
+const uint8_t BUZZER = 4;
+const uint8_t WIFI_LED = 5;
+const uint8_t COMMIT_LED = 2;
+
+// wifi status
+int status = WL_IDLE_STATUS;
 
 void setup()
 {
-    pinMode(BUZZER, OUTPUT); 
+    pinMode(BUZZER, OUTPUT);
+    pinMode(WIFI_LED, OUTPUT);
+    pinMode(COMMIT_LED, OUTPUT);
+
+    
     Serial.begin(9600);
 
     WiFi.mode(WIFI_STA);
@@ -30,11 +39,11 @@ void setup()
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
         Serial.print(".");
+        
     }
-
     Serial.println("Connected");
+    digitalWrite(WIFI_LED, HIGH);
     
-
     filter_sha["sha"] = true;
 
     client.setInsecure();
@@ -60,10 +69,10 @@ void loop()
       if(sha.length() > 5 && sha != saved_sha){
           Serial.println("New sha detected: "+sha);
           saved_sha = sha;
+
+          playBuzzer();
+          flashLed();
           
-          tone(BUZZER, 1000);
-          delay(750);
-          noTone(BUZZER);
 
           Serial.println("Updated...");
       }
@@ -73,4 +82,19 @@ void loop()
 
     delay(5000);
   
+}
+
+void playBuzzer() {
+  tone(BUZZER, 1000);
+  delay(750);
+  noTone(BUZZER);
+}
+
+void flashLed() {
+  for (int i=0;i<10;i++) {
+    digitalWrite(COMMIT_LED, HIGH);
+    delay(150);
+    digitalWrite(COMMIT_LED, LOW);
+    delay(150);
+    }
 }
