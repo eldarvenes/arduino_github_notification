@@ -19,13 +19,16 @@ StaticJsonDocument<64> doc;
 
 const uint8_t BUZZER = 4;
 const uint8_t WIFI_LED = 5;
-const uint8_t COMMIT_LED = 2;
+const uint8_t COMMIT_LED = 12;
 
 // wifi status
 int status = WL_IDLE_STATUS;
 
 void setup()
 {
+    pinMode(LED_BUILTIN, OUTPUT);
+    digitalWrite(LED_BUILTIN, HIGH);
+    
     pinMode(BUZZER, OUTPUT);
     pinMode(WIFI_LED, OUTPUT);
     pinMode(COMMIT_LED, OUTPUT);
