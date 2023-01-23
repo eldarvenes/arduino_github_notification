@@ -52,8 +52,16 @@ void setup()
 }
 
 void loop()
-{
-    httpsClient.begin(client, endpoint);
+{ 
+    if(checkForCommits()) {
+      playBuzzer();
+      flashLed();
+    }
+    delay(5000);
+}
+
+boolean checkForCommits() {
+  httpsClient.begin(client, endpoint);
     httpsClient.addHeader("Authorization", "token " + token);
     httpsClient.GET();
     deserializeJson(doc, httpsClient.getStream(), DeserializationOption::Filter(filter_sha));
@@ -61,7 +69,7 @@ void loop()
 
     String sha = doc["sha"];
     
-    if(saved_sha.equals("") && sha.length() > 5){
+  if(saved_sha.equals("") && sha.length() > 5){
       Serial.println("Storing sha: "+sha);
       saved_sha = sha;
     } else {
@@ -72,17 +80,14 @@ void loop()
           Serial.println("New sha detected: "+sha);
           saved_sha = sha;
 
-          playBuzzer();
-          flashLed();
-          
+          //playBuzzer();
+          //flashLed();
+          return true;
           Serial.println("Updated...");
       }
-
+      return false;
       Serial.println("Nothing to do");
     }
-
-    delay(5000);
-  
 }
 
 void playBuzzer() {
