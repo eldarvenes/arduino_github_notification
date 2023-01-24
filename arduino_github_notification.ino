@@ -4,6 +4,7 @@
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
 
+// Add config in config.h
 const char wifi_ssid[] = WIFI_SSID;
 const char wifi_password[] = WIFI_PASSWORD;
 const char endpoint[] = ENDPOINT;
@@ -47,6 +48,7 @@ void setup()
     digitalWrite(WIFI_LED, HIGH);
     
     filter_sha["sha"] = true;
+    
 
     client.setInsecure();
 }
@@ -65,6 +67,9 @@ boolean checkForCommits() {
     httpsClient.addHeader("Authorization", "token " + token);
     httpsClient.GET();
     deserializeJson(doc, httpsClient.getStream(), DeserializationOption::Filter(filter_sha));
+   
+    //serializeJsonPretty(doc, Serial); // Print debug of response
+    
     httpsClient.end();
 
     String sha = doc["sha"];
