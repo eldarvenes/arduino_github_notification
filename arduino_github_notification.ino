@@ -3,10 +3,17 @@
 #include <ESP8266WiFi.h>
 #include <ESP8266HTTPClient.h>
 #include <ArduinoJson.h>
+#include <ESP8266WiFiMulti.h>
 
 // Add config in config.h
 const char wifi_ssid[] = WIFI_SSID;
 const char wifi_password[] = WIFI_PASSWORD;
+const char wifi_ssid2[] = WIFI_SSID2;
+const char wifi_password2[] = WIFI_PASSWORD2;
+
+ESP8266WiFiMulti wifiMulti;
+const uint32_t connectTimeoutMs = 5000;
+
 const char endpoint[] = ENDPOINT;
 const String token = TOKEN;
 
@@ -27,6 +34,9 @@ int status = WL_IDLE_STATUS;
 
 void setup()
 {
+    Serial.begin(9600);
+
+    // turn off build in led
     pinMode(LED_BUILTIN, OUTPUT);
     digitalWrite(LED_BUILTIN, HIGH);
     
@@ -34,31 +44,34 @@ void setup()
     pinMode(WIFI_LED, OUTPUT);
     pinMode(COMMIT_LED, OUTPUT);
 
-    Serial.begin(9600);
-
     WiFi.mode(WIFI_STA);
 
-    WiFi.begin(wifi_ssid, wifi_password);
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-        
-    }
-    Serial.println("Connected");
-    digitalWrite(WIFI_LED, HIGH);
+    wifiMulti.addAP(wifi_ssid, wifi_password);
+    wifiMulti.addAP(wifi_ssid2, wifi_password2);    
     
     filter_sha["sha"] = true;
     
-
     client.setInsecure();
 }
 
 void loop()
 { 
+if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+    Serial.print("WiFi connected: ");
+    Serial.print(WiFi.SSID());
+    Serial.print(" ");
+    Serial.println(WiFi.localIP());
+    digitalWrite(WIFI_LED, HIGH);
+ 
     if(checkForCommits()) {
       playBuzzer();
       flashLed();
     }
+
+
+    } else {
+    Serial.println("WiFi not connected!");
+  }
     delay(5000);
 }
 
